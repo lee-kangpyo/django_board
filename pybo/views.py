@@ -1,8 +1,9 @@
 # from django.http import HttpResponse
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import Question
-from .forms import QuestionForm
+from .forms import QuestionForm, AnswerForm
 
 
 def index(request):
@@ -20,13 +21,30 @@ def detail(request, question_id):
 
 
 def answer_create(request, question_id):
+    '''
+    답변등록    
+    '''
     question = get_object_or_404(Question, id=question_id)
-    question.answer_set.create(content=request.POST.get('content'), create_date=timezone.now())
+    
+    # request로 질문 객체 만드는 3가지
+    # question.answer_set.create(content=request.POST.get('content'), create_date=timezone.now())
     # 아래코드로 저장도 가능 Answer 클래스 import 필요
     # answer = Answer(question=question, content=request.POST.get('content'), create_date=timezone.now())
-    # answer.save()QuestionForm
+    # answer.save()
 
-    return redirect("pybo:detail", question_id=question.id)
+    if request.method == "POST":
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.create_date = timezone.now()
+            answer.question = question
+            answer.save()
+            return redirect('pybo:detail', question_id=question.id)
+    else:
+        return HttpResponseNotAllowed('Only POST is possible.')
+    context = {'question': question, 'form': form}
+    return render(request, 'pybo/question_detail.html', context)
+
 
 
 def question_create(request):
