@@ -9,7 +9,7 @@ from django.core.paginator import Paginator
 def index(request):
     # 단순하게 문자열을 브라우저에 출력
     # return HttpResponse("안녕하세요 pybo에 오신것을 환영합니다.")
-    page = request.GET.get("page", '1')                         # 페이지
+    page = request.GET.get("page", '1')                         # 키값 페이지에 해당하는 값을 가져온다. 기본값:1
     question_list = Question.objects.order_by("-create_date")
     paginator = Paginator(question_list, 10)                    # 페이지당 10개씩 보여주기
     page_obj = paginator.get_page(page)
