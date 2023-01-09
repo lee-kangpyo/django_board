@@ -7,6 +7,7 @@ def signup(request):
     if request.method == "POST":
         #POST 요청의 경우 입력된 데이터로 사용자를 생성
         form = UserForm(request.POST)
+
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
